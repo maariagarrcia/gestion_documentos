@@ -34,7 +34,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/")
 async def root(request: Request):
-    return {"Bienvenido a la gestión de documentos"}
+    return templates.TemplateResponse("base.html", {"request": request})
 
 models.Base.metadata.create_all(engine)
 

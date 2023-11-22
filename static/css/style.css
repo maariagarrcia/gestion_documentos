@@ -1,0 +1,75 @@
+body {
+    background-color: #f0f0f0; /* Gris claro */
+    color: #333; /* Texto negro */
+}
+
+header {
+    background-color: #5d5c5c; /* Azul claro */
+    text-align: center;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+h1 {
+    margin: 0;
+    color: white; /* Texto blanco */
+}
+
+nav {
+    background-color: #5d5c5c; /* Azul claro */
+    color: #5d5c5c;
+    padding: 5px;
+}
+
+
+
+#success-message {
+    display: none;
+}
+
+#user-container {
+    border: 1px solid #b3b3b3; 
+    padding: 3px;
+    background-color: #b3b3b3; /* Azul claro */
+    border-radius: 4px;
+    margin-left: 6px;
+}
+
+#username {
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#logout-container {
+    display: none;
+    margin-left: 10px;
+}
+
+#login-form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+label {
+    color: #333; /* Texto negro */
+}
+
+button {
+    background-color: #b3b3b3; /* Azul claro */
+    color: white; /* Texto blanco */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #cbe4fa; /* Azul oscuro al pasar el ratón */
+}

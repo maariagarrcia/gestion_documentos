@@ -23,29 +23,24 @@ router.mount("/static/css/", StaticFiles(directory="static/css"), name="static")
 router.mount("/templates", StaticFiles(directory="templates"), name="templates")
 templates = Jinja2Templates(directory="templates")
 
-# create user
-@router.post('/',response_model=UserDisplayModel)
-def create_users(request:UserBaseModel, db:Session = Depends(get_db)):
+
+@router.post('/create', response_model=UserDisplayModel)
+async def create_user(request: UserBaseModel, db: Session = Depends(get_db)):
     return db_user.CrudUser.create_user(db, request)
 
-# read all  users: el query simplemente es un select * from user para oobtenr los datos del usuario
-@router.get('/', response_model=List[UserDisplayModel])
-def get_all_users(db:Session = Depends(get_db),current_user:UserBaseModel = Depends(get_current_user)):
-    return db_user.CrudUser.get_all_users(db)
+@router.get('/get_all', response_model=List[UserDisplayModel])
+async def get_all_users(db: Session = Depends(get_db)):
+    return db_user.CrudUser.get_all(db)
 
-# read 1 user
-@router.get('/{id}', response_model=UserDisplayModel)
-def get_user_by_id(id:int, db:Session = Depends(get_db),current_user:UserBaseModel = Depends(get_current_user)):
-    return db_user.CrudUser.get_user_by_id(db, id)
+@router.get('/login', response_model=UserDisplayModel)
+async def get_user_by_username(username: str, db: Session = Depends(get_db)):
+    return db_user.CrudUser.get_user_by_username(username, db)
 
+@router.put('/{id}', response_model=UserDisplayModel)
+async def update_user(id: int, request: UserBaseModel, db: Session = Depends(get_db)):
+    return db_user.CrudUser.update_user(id, request, db)
 
-# update user
-@router.post('/{id}/update', response_model=UserDisplayModel)
-def update_user(id:int, request:UserBaseModel, db:Session = Depends(get_db),current_user:UserBaseModel = Depends(get_current_user)):
-    return db_user.CrudUser.update_user(db, id, request)
+@router.delete('/{id}/delete')
+async def delete_user(id: int, db: Session = Depends(get_db)):
+    return db_user.CrudUser.delete_user(id, db)
 
-
-# delete user
-@router.get('/{id}/delete')
-def delete_user(id:int, db:Session = Depends(get_db),current_user:UserBaseModel = Depends(get_current_user)):
-    return db_user.CrudUser.delete_user(db, id)
