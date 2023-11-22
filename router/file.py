@@ -41,7 +41,7 @@ async def get_all(db: Session = Depends(get_db),current_user:UserAuth = Depends(
     return db_file.CrudFile.get_all(db)
 
 
-ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", ".pdf", ".txt"}
+ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", ".pdf", ".txt", ".doc", ".docx", ".odt", ".svg", ".webp", ".jfif", ".webm", ".mov", ".wmv", ".flv", ".3gp"}
 
 @router.post("/uploadfile/")
 async def upload_file(upload_file: UploadFile = File(...), current_user: UserAuth = Depends(get_current_user)):
@@ -62,9 +62,8 @@ async def upload_file(upload_file: UploadFile = File(...), current_user: UserAut
         path = f'./files/videos/{filename}'
     elif file_ext.lower() == ".pdf":
         path = f'./files/docs/pdf/{filename}'
-    elif file_ext.lower() == {".txt", ".doc", ".docx", ".odt"}:
+    elif file_ext.lower() in {".txt", ".doc", ".docx", ".odt"}:
         path = f'./files/docs/text/{filename}'
-     
     else:
         return {"error": "Tipo de archivo no reconocido"}
     
