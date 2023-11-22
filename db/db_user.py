@@ -72,7 +72,8 @@ class CrudUser(CrudUserInterfaz):
             db.commit()
             return UserDisplayModel(
                 id=user.id,
-                username=user.username
+                username=user.username,
+                email=user.email
             )
         else:
             raise HTTPException(status_code=404, detail="User not found")

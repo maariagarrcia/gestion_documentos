@@ -13,6 +13,7 @@ from db.database import engine
 
 
 from router import file, user
+from auth import authentication
 
 
 
@@ -20,6 +21,7 @@ from router import file, user
 app = FastAPI()
 app.include_router(user.router)
 app.include_router(file.router)
+app.include_router(authentication.router)                                               
 
 
 app.mount("/static/css/", StaticFiles(directory="static/css"), name="static")
