@@ -14,57 +14,27 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 
 
+class DbUser(Base):
+    __tablename__ = "user"
 
-class Documento(Base):
-    __tablename__ = "documento"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String)
+    email = Column(String)
+    hashed_password = Column(String)
 
-    id = Column(Integer, primary_key=True)
+    file = relationship("DbFile", back_populates="user")
+
+    
+
+class DbFile(Base):
+    __tablename__ = "file"
+
+    id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String)
-    tipo = Column(String)
     tamaño = Column(Integer)
-    acceso = Column(Boolean)
-    propietario = Column(String)
+    url = Column(String)
+    tipo_url = Column(String)
 
-    carpetas = relationship("Carpeta", back_populates="documento")
-    rutas = relationship("Ruta", back_populates="documento")
-    accesos = relationship("Acceso", back_populates="documento")
-    registros_acceso = relationship("Registro", back_populates="documento")
+    user_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship("DbUser", back_populates="file")
 
-class Carpeta(Base):
-    __tablename__ = "carpeta"
-
-    id = Column(Integer, primary_key=True)
-    nombre = Column(String)
-    elementos = Column(String)
-
-    documento_id = Column(Integer, ForeignKey("documento.id"))
-    documento = relationship("Documento", back_populates="carpetas")
-
-class Ruta(Base):
-    __tablename__ = "ruta"
-
-    id = Column(Integer, primary_key=True)
-    nombre = Column(String)
-    destino = Column(String)
-
-    documento_id = Column(Integer, ForeignKey("documento.id"))
-    documento = relationship("Documento", back_populates="rutas")
-
-class Acceso(Base):
-    __tablename__ = "acceso"
-
-    id = Column(Integer, primary_key=True)
-    nombre = Column(String)
-    tipo = Column(String)
-
-    documento_id = Column(Integer, ForeignKey("documento.id"))
-    documento = relationship("Documento", back_populates="accesos")
-
-class Registro(Base):
-    __tablename__ = "registro"
-
-    id = Column(Integer, primary_key=True)
-    # Otras columnas de registro...
-
-    documento_id = Column(Integer, ForeignKey("documento.id"))
-    documento = relationship("Documento", back_populates="registros_acceso")

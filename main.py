@@ -12,18 +12,30 @@ from db import models
 from db.database import engine
 
 
+from router import file, user
+
+
+
+
 app = FastAPI()
+app.include_router(user.router)
+app.include_router(file.router)
 
 
 app.mount("/static/css/", StaticFiles(directory="static/css"), name="static")
+
+app.mount("/files/images", StaticFiles(directory="files/images"), name="files")
+
 app.mount("/templates", StaticFiles(directory="templates"), name="templates")
 templates = Jinja2Templates(directory="templates")
+
 
 @app.get("/")
 async def root(request: Request):
     return {"Bienvenido a la gestión de documentos"}
 
 models.Base.metadata.create_all(engine)
+
 
 if __name__ == "__main__":
     print("-> Inicio integrado de servicIo web")
