@@ -24,8 +24,6 @@ nav {
     padding: 5px;
 }
 
-
-
 #success-message {
     display: none;
 }
@@ -50,7 +48,7 @@ nav {
 }
 
 #login-form {
-    background-color: white;
+    background-color: #fff; /* Fondo blanco */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -58,18 +56,22 @@ nav {
 }
 
 label {
-    color: #333; /* Texto negro */
+    color: #5d5c5c; /* Color del texto de la etiqueta */
+    font-weight: bold; /* Negrita */
+    display: block; /* Hace que las etiquetas estén en líneas separadas */
+    margin-bottom: 8px; /* Espaciado inferior para separar las etiquetas de los campos de entrada */
 }
-
+/* Styled the submit button */
 button {
-    background-color: #b3b3b3; /* Azul claro */
+    background-color: #8c8c8c; /* Azul brillante */
     color: white; /* Texto blanco */
     border: none;
     padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
+    transition: background-color 0.3s ease; /* Agregado efecto de transición */
 }
 
 button:hover {
-    background-color: #cbe4fa; /* Azul oscuro al pasar el ratón */
+    background-color: #787a7b; /* Azul oscuro al pasar el ratón */
 }

@@ -8,6 +8,7 @@
     <link  type="text/css" rel="stylesheet" href="/static/css/style.css">
 
     <script>
+    
         function cerrar_sesion() {
             document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
@@ -44,7 +45,7 @@
 
                 // Muestra el elemento de información del usuario
                 document.getElementById("success-message").style.display = "block";
-                document.getElementById("navbar-nav").style.display = "none";
+                document.getElementById("n").style.display = "none";
                 document.getElementById("navbar").style.display = "block";
                 logoutContainer.style.display = "block";
 
@@ -69,7 +70,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
     <a class="navbar-brand" href="/templates/base.html">Inicio</a>
 
-    <ul class="navbar-nav ml-4">
+    <div id="n">
+    <ul class="navbar-nav ml-4" >
         <li class="nav-item">
             <a class="nav-link" href="/templates/login.html">Iniciar Sesión</a>
         </li>
@@ -77,16 +79,17 @@
             <a class="nav-link" href="/templates/register.html">Regístrate</a>
         </li>
     </ul>
+    </div>
 
-    <div id="success-message">
-        <div id="user-container">
-            <span id="username"></span>
+    <div id="success-message" style="display: none;">
+        <div id="user-container" style="border: 1px solid #dc3545;  background-color: #dc3545  ; border-radius: 4px;">
+        <span id="username" style="color: white; font-size: 14px; font-weight: bold;"></span>
         </div>
     </div>
 
-    <div id="logout-container">
-        <span id="logout-username"></span>
-        <button onclick="cerrar_sesion()" class="btn btn-danger btn-sm ml-2">Cerrar Sesión</button>
+    <div id="logout-container" style="display: none; ">
+        <span id="username" style="color: white;"></span>
+        <button onclick="cerrar_sesion()" class="btn btn-danger btn-sm">Cerrar Sesión</button>
     </div>
 
 </nav>
@@ -105,7 +108,7 @@
         <label for="password">Contraseña:</label>
         <input type="password" id="password" name="password" required>
         <br>
-        
+        <br>
         <button onclick="send()">Iniciar Sesión</button>
     </div>
 </div>
