@@ -42,35 +42,42 @@ async def get_all(db: Session = Depends(get_db),current_user:UserAuth = Depends(
 
 
 
-ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", ".pdf", ".txt", ".doc", ".docx", ".odt", ".svg", ".webp", ".jfif", ".webm", ".mov", ".wmv", ".flv", ".3gp"}
+# Definir extensiones permitidas
+ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", ".pdf", ".txt", ".docx", ".doc", ".odt", ".rtf", ".tex", ".wks", ".wps", ".wpd", ".mov", ".wmv", ".flv", ".webm", ".bmp", ".ico", ".webp"}
 
-def get_user_folder(user_id: int):
-    # Cambia esta función según cómo estés manejando las carpetas de los usuarios
-    # Puedes usar el ID del usuario para crear carpetas únicas para cada usuario.
-    user_folder = f"./files/users/{user_id}/"
-    os.makedirs(user_folder, exist_ok=True)
-    return user_folder
+# Ruta para manejar la carga de archivos
+@router.post("/uploadfile")
+async def upload_file(upload_file: UploadFile = File(...)):
+    file_ext = os.path.splitext(upload_file.filename)[1].lower()  # Convertir la extensión a minúsculas
 
-@router.post("/uploadfile/")
-async def upload_file(upload_file: UploadFile = File(...), current_user: UserAuth = Depends(get_current_user), folder_name: str = ""):
-    file_ext = os.path.splitext(upload_file.filename)[1]
-
-    if file_ext.lower() not in ALLOWED_EXTENSIONS:
+    if file_ext not in ALLOWED_EXTENSIONS:
         return {"error": "Formato de archivo no permitido"}
 
-    user_folder = get_user_folder(current_user.id)
+    # Genera un nombre único para el archivo
+    letters = string.ascii_letters
+    rand_str = ''.join(random.choice(letters) for i in range(6))
+    new_filename = f"{rand_str}{file_ext}"
 
-    if folder_name:
-        user_folder = os.path.join(user_folder, folder_name)
-        os.makedirs(user_folder, exist_ok=True)
+    # Construye la ruta completa del archivo según su tipo
+    if file_ext in {".png", ".jpg", ".jpeg", ".gif", ".svg", ".bmp", ".ico", ".webp"}:
+        file_path = f"files/images/{new_filename}"
 
-    filename = upload_file.filename
-    path = os.path.join(user_folder, filename)
+    elif file_ext in {".mp4", ".avi", ".mkv", ".mov", ".wmv", ".flv", ".webm"}:
+        file_path = f"files/videos/{new_filename}"
 
-    with open(path, 'wb') as buffer:
+    elif file_ext == ".pdf":
+        file_path = f"files/docs/pdf/{new_filename}"
+        
+    elif file_ext in {".txt", ".docx", ".doc", ".odt", ".rtf", ".tex", ".wks", ".wps", ".wpd"}:
+        file_path = f"files/docs/text/{new_filename}"
+    else:
+        return {"error": "Tipo de archivo no reconocido"}
+
+    # Guarda el archivo en la ruta deseada
+    with open(file_path, 'w+b') as buffer:
         shutil.copyfileobj(upload_file.file, buffer)
 
-    return {"filename": path}
+    return {"filename": file_path}
 
 
 @router.delete("/delete_file/{id}")

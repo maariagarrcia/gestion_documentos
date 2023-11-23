@@ -48,11 +48,18 @@ class CrudCarpeta(CrudCarpetaInterface):
     @staticmethod
     def get_carpeta(db: Session, id: int):
         carpeta = db.query(DbCarpeta).filter(DbCarpeta.id == id).first()
+        archivos = [archivo.nombre for archivo in carpeta.archivos]
+        userr = User(id=carpeta.user_id, username=" ")
+        carpeta = CarpetaDisplayModel(
+            nombre=carpeta.nombre, tamaño=carpeta.tamaño, user=userr, archivos=archivos)
         return carpeta
+
 
     @staticmethod
     def get_all_carpeta(db: Session):
         carpetas = db.query(DbCarpeta).all()
+        carpetas = [CarpetaDisplayModel(nombre=carpeta.nombre, tamaño=carpeta.tamaño, user=User(id=carpeta.user_id, username=" "), archivos=[
+                                        archivo.nombre for archivo in carpeta.archivos]) for carpeta in carpetas]
         return carpetas
 
     @staticmethod

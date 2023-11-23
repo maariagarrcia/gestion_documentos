@@ -8,53 +8,51 @@
     <link type="text/css" rel="stylesheet" href="/static/css/style.css">
 
     <script>
-function uploadFile() {
-    const fileInput = document.getElementById('fileInput');
-    const folderInput = document.getElementById('folderInput');
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
 
-    const file = fileInput.files[0];
-    const folderName = folderInput.value;
+            const file = fileInput.files[0];
+            const folderName = folderInput.value;
 
-    if (!file) {
-        alert('Seleccione un archivo primero.');
-        return;
-    }
+            if (!file) {
+                alert('Seleccione un archivo primero.');
+                return;
+            }
 
-    const formData = new FormData();
-    formData.append('upload_file', file);
-    formData.append('folder_name', folderName);
+            const formData = new FormData();
+            formData.append('upload_file', file);
 
-    fetch('http://tu-api.com/uploadfile/', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Aquí puedes manejar la respuesta del servidor
-        if (data.filename) {
-            displayUploadedFile(data.filename);
-        } else {
-            alert('Error al subir el archivo.');
+            fetch('http://127.0.0.1:8000/file/uploadfile', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Aquí puedes manejar la respuesta del servidor
+                if (data.filename) {
+                    displayUploadedFile(data.filename);
+                } else {
+                    alert('Error al subir el archivo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al subir el archivo.');
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error al subir el archivo.');
-    });
-}
 
-function displayUploadedFile(filename) {
-    const fileLink = document.createElement('a');
-    fileLink.href = filename;
-    fileLink.textContent = filename;
-    fileLink.target = '_blank'; // Para abrir en una nueva pestaña
+        function displayUploadedFile(filename) {
+            const fileLink = document.createElement('a');
+            fileLink.href = filename;
+            fileLink.textContent = filename;
+            fileLink.target = '_blank'; // Para abrir en una nueva pestaña
 
-    const lineBreak = document.createElement('br');
+            const lineBreak = document.createElement('br');
 
-    const uploadedFilesContainer = document.getElementById('uploadedFiles');
-    uploadedFilesContainer.appendChild(fileLink);
-    uploadedFilesContainer.appendChild(lineBreak);
-}
+            const uploadedFilesContainer = document.getElementById('uploadedFiles');
+            uploadedFilesContainer.appendChild(fileLink);
+            uploadedFilesContainer.appendChild(lineBreak);
+        }
 
     </script>
 </head>
@@ -92,7 +90,6 @@ function displayUploadedFile(filename) {
 </nav>
 
     <input type="file" id="fileInput" />
-    <input type="text" id="folderInput" placeholder="Nombre de la carpeta" />
     <button onclick="uploadFile()">Subir Archivo</button>
     
     <div id="uploadedFiles"></div>

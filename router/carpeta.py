@@ -28,11 +28,11 @@ templates = Jinja2Templates(directory="templates")
 async def create_carpeta(request: CarpetaBaseModel, db: Session = Depends(get_db)):
     return db_carpeta.CrudCarpeta.create_carpeta(db=db, request=request)
 
-@router.get("/get_carpeta/{id}")
+@router.get("/get_carpeta/{id}", response_model=CarpetaDisplayModel)
 async def get_carpeta(id: int, db: Session = Depends(get_db)):
     return db_carpeta.CrudCarpeta.get_carpeta(db, id)
 
-@router.get("/get_all_carpeta")
+@router.get("/get_all_carpeta",response_model=List[CarpetaDisplayModel])
 async def get_all_carpeta(db: Session = Depends(get_db)):
     return db_carpeta.CrudCarpeta.get_all_carpeta(db)
 
