@@ -36,7 +36,7 @@ async def create_file(request: FileBaseModel, db: Session = Depends(get_db), cur
     return db_file.CrudFile.create_file(db, request)
 
 
-@router.get("/get_all", response_model=List[FileDisplayModel],)
+@router.get("/get_all", response_model=List[FileDisplayModel])
 async def get_all(db: Session = Depends(get_db),current_user:UserAuth = Depends(get_current_user)):
     return db_file.CrudFile.get_all(db)
 

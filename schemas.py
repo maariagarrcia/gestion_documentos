@@ -14,6 +14,7 @@ class UserDisplayModel(BaseModel):
 
 
 class User(BaseModel):
+    id: int
     username: str
  
     class Config():
@@ -25,6 +26,7 @@ class FileBaseModel(BaseModel):
     url:str
     tipo_url:str
     user_id:int
+    carpeta_id:int
 
 class FileDisplayModel(BaseModel):
     id:int
@@ -33,6 +35,7 @@ class FileDisplayModel(BaseModel):
     url:str
     tipo_url:str
     user: User
+    carpeta_id:int
 
     class Config():
         orm_mode = True
@@ -41,3 +44,20 @@ class FileDisplayModel(BaseModel):
 class UserAuth(BaseModel):
     id: int
     username: str
+
+
+class CarpetaBaseModel(BaseModel):
+    nombre:str 
+    tamaño:int
+    user_id:int
+    archivos: List[str] = []
+
+
+class CarpetaDisplayModel(BaseModel):
+    nombre:str
+    tamaño:int
+    user: User
+    archivos: List[str] = []
+
+    class Config():
+        orm_mode = True

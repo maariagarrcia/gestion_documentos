@@ -12,13 +12,14 @@ from db import models
 from db.database import engine
 
 
-from router import file, user
+from router import file, user,carpeta
 from auth import authentication
 
 
 
 
 app = FastAPI()
+app.include_router(carpeta.router)
 app.include_router(user.router)
 app.include_router(file.router)
 app.include_router(authentication.router)                                               
