@@ -159,6 +159,55 @@
                 console.error('Error:', error);
             }
         }
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Seleccione un archivo primero.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('upload_file', file);
+
+            fetch('http://127.0.0.1:8000/file/uploadfile', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the server response
+                if (data.filename) {
+                    displayUploadedFile(data.filename);
+                } else {
+                    alert('Error al subir el archivo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al subir el archivo.');
+            });
+        }
+
+function displayUploadedFile(filename) {
+    // Construct the correct URL without the /templates path
+    const imageUrl = `http://127.0.0.1:8000/${filename}`;
+
+    const fileLink = document.createElement('a');
+    fileLink.href = imageUrl;
+    fileLink.textContent = imageUrl; // You can modify this as needed
+    fileLink.target = '_blank'; // To open in a new tab
+
+    const lineBreak = document.createElement('br');
+
+    const uploadedFilesContainer = document.getElementById('uploadedFiles');
+    uploadedFilesContainer.appendChild(fileLink);
+    uploadedFilesContainer.appendChild(lineBreak);
+}
+
     </script>
 </head>
 <body>
@@ -214,6 +263,11 @@
                         <ul class="list-group" id="listaArchivos">
                             <!-- Puedes generar dinámicamente estos archivos desde tu backend -->
                         </ul>
+                        <input type="file" id="fileInput" />
+                        <button onclick="uploadFile()">Subir Archivo</button>
+                        <div id="uploadedFiles"></div>
+
+
                     </div>
                 </div>
 

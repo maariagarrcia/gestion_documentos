@@ -40,15 +40,12 @@ async def create_file(request: FileBaseModel, db: Session = Depends(get_db), cur
 async def get_all(db: Session = Depends(get_db),current_user:UserAuth = Depends(get_current_user)):
     return db_file.CrudFile.get_all(db)
 
-
-
-# Definir extensiones permitidas
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", ".pdf", ".txt", ".docx", ".doc", ".odt", ".rtf", ".tex", ".wks", ".wps", ".wpd", ".mov", ".wmv", ".flv", ".webm", ".bmp", ".ico", ".webp"}
 
-# Ruta para manejar la carga de archivos
+
 @router.post("/uploadfile")
-async def upload_file(upload_file: UploadFile = File(...)):
-    file_ext = os.path.splitext(upload_file.filename)[1].lower()  # Convertir la extensión a minúsculas
+async def upload_file(file: UploadFile = File(...),db: Session = Depends(get_db), current_user: UserAuth = Depends(get_current_user)):
+    file_ext = os.path.splitext(file.filename)[1].lower()  # Convertir la extensión a minúsculas
 
     if file_ext not in ALLOWED_EXTENSIONS:
         return {"error": "Formato de archivo no permitido"}
@@ -75,10 +72,18 @@ async def upload_file(upload_file: UploadFile = File(...)):
 
     # Guarda el archivo en la ruta deseada
     with open(file_path, 'w+b') as buffer:
-        shutil.copyfileobj(upload_file.file, buffer)
+        shutil.copyfileobj(file.file, buffer)
+
+    file.file.seek(0, os.SEEK_END)
+    file_size = file.file.tell()
+
+    # Guarda la información del archivo en la base de datos (you may need to adjust this part based on your model structure)
+    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=current_user.id, carpeta_id=1)
+    db.add(new_file)
+    db.commit()
+
 
     return {"filename": file_path}
-
 
 @router.delete("/delete_file/{id}")
 async def delete_file(id: int, db: Session = Depends(get_db), current_user: UserAuth = Depends(get_current_user)):
