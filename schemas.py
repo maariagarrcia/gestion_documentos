@@ -54,6 +54,7 @@ class CarpetaBaseModel(BaseModel):
 
 
 class CarpetaDisplayModel(BaseModel):
+    id:int
     nombre:str
     tamaño:int
     user: User

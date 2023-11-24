@@ -43,6 +43,7 @@ class CrudCarpeta(CrudCarpetaInterface):
         db.refresh(new_carpeta)
         new_carpeta = CarpetaDisplayModel(nombre=new_carpeta.nombre, tamaño=new_carpeta.tamaño, user=userr, archivos=[
                                           archivo.nombre for archivo in new_carpeta.archivos])
+        
         return new_carpeta
 
     @staticmethod
@@ -51,14 +52,14 @@ class CrudCarpeta(CrudCarpetaInterface):
         archivos = [archivo.nombre for archivo in carpeta.archivos]
         userr = User(id=carpeta.user_id, username=" ")
         carpeta = CarpetaDisplayModel(
-            nombre=carpeta.nombre, tamaño=carpeta.tamaño, user=userr, archivos=archivos)
+            id=carpeta.id,nombre=carpeta.nombre, tamaño=carpeta.tamaño, user=userr, archivos=archivos)
         return carpeta
 
 
     @staticmethod
     def get_all_carpeta(db: Session):
         carpetas = db.query(DbCarpeta).all()
-        carpetas = [CarpetaDisplayModel(nombre=carpeta.nombre, tamaño=carpeta.tamaño, user=User(id=carpeta.user_id, username=" "), archivos=[
+        carpetas = [CarpetaDisplayModel(id=carpeta.id,nombre=carpeta.nombre, tamaño=carpeta.tamaño, user=User(id=carpeta.user_id, username=" "), archivos=[
                                         archivo.nombre for archivo in carpeta.archivos]) for carpeta in carpetas]
         return carpetas
 

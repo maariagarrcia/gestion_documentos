@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from db.database import get_db
 from db import db_file
 from db.db_file import CrudFile
-from db.models import DbFile
+from db.models import DbFile, DbCarpeta
 
 from schemas import FileBaseModel, FileDisplayModel,UserAuth
 
@@ -17,6 +17,7 @@ import shutil
 
 from auth.oauth2 import get_current_user
 
+from fastapi.responses import JSONResponse
 import os
 
 router = APIRouter(
@@ -43,8 +44,15 @@ async def get_all(db: Session = Depends(get_db),current_user:UserAuth = Depends(
 ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", ".pdf", ".txt", ".docx", ".doc", ".odt", ".rtf", ".tex", ".wks", ".wps", ".wpd", ".mov", ".wmv", ".flv", ".webm", ".bmp", ".ico", ".webp"}
 
 
-@router.post("/uploadfile")
-async def upload_file(file: UploadFile = File(...),db: Session = Depends(get_db), current_user: UserAuth = Depends(get_current_user)):
+@router.post("/uploadfile/{user_id}/{carpeta_id}")
+async def upload_file(carpeta_id:int,file: UploadFile = File(...),db: Session = Depends(get_db)):
+    # Verifica si la carpeta existe
+    carpeta = db.query(DbCarpeta).filter(DbCarpeta.id == carpeta_id).first()
+
+    if not carpeta:
+        raise HTTPException(status_code=404, detail="Carpeta no encontrada")
+
+    
     file_ext = os.path.splitext(file.filename)[1].lower()  # Convertir la extensión a minúsculas
 
     if file_ext not in ALLOWED_EXTENSIONS:
@@ -78,9 +86,10 @@ async def upload_file(file: UploadFile = File(...),db: Session = Depends(get_db)
     file_size = file.file.tell()
 
     # Guarda la información del archivo en la base de datos (you may need to adjust this part based on your model structure)
-    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=current_user.id, carpeta_id=1)
+    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=1, carpeta_id=carpeta.id)
     db.add(new_file)
     db.commit()
+
 
 
     return {"filename": file_path}

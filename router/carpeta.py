@@ -14,6 +14,7 @@ from fastapi import Request
 from auth import authentication
 from auth.oauth2 import get_current_user
 
+from fastapi.responses import JSONResponse
 
 router = APIRouter(
     prefix='/carpeta',
@@ -44,4 +45,12 @@ async def update_carpeta(id: int, request: CarpetaDisplayModel, db: Session = De
 async def delete_carpeta(id: int, db: Session = Depends(get_db)):
     return db_carpeta.CrudCarpeta.delete_carpeta(db=db, id=id)
 
+@router.post("/set_carpeta_id/{user_id}/{carpeta_id}")
+async def set_carpeta_id(
+    user_id: int,
+    carpeta_id: int
+):
+    response= JSONResponse(content={"carpeta_id": carpeta_id})
+    response.set_cookie(key="carpeta_id", value=f"{carpeta_id}")
 
+    return response
