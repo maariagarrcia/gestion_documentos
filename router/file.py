@@ -90,7 +90,7 @@ async def upload_file(carpeta_id:int, file: UploadFile = File(...),db: Session =
     file_size = file.file.tell()
 
     # Guarda la información del archivo en la base de datos (you may need to adjust this part based on your model structure)
-    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=1, carpeta_id=carpeta.id, tipo=0)
+    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=1, carpeta_id=carpeta.id)
     db.add(new_file)
     db.commit()
 

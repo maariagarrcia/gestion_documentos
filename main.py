@@ -15,6 +15,10 @@ from db.database import engine
 from router import file, user,carpeta
 from auth import authentication
 
+from fastapi.responses import JSONResponse
+
+from schemas import RegistroClic
+
 
 
 
@@ -36,6 +40,25 @@ templates = Jinja2Templates(directory="templates")
 @app.get("/")
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
+
+
+def guardar_en_archivo(info):
+    with open("registros_clic.txt", "a") as archivo:
+        archivo.write(info + "\n")
+
+@app.post("/registrar_clic")
+async def registrar_clic(registro: RegistroClic):
+    try:
+        # Formatear la información
+        info = f"User ID: {registro.user_id}, Elemento: {registro.elemento}, Tipo: {registro.tipo}"
+
+        # Guardar la información en un archivo de texto
+        guardar_en_archivo(info)
+
+        return {"message": "Clic registrado con éxito"}
+    except Exception as e:
+        return {"error": str(e)}
+
 
 models.Base.metadata.create_all(engine)
 

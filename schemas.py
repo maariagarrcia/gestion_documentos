@@ -62,3 +62,8 @@ class CarpetaDisplayModel(BaseModel):
 
     class Config():
         orm_mode = True
+
+class RegistroClic(BaseModel):
+    user_id: str
+    elemento: str
+    tipo: str
