@@ -69,17 +69,3 @@ input {
     box-sizing: border-box;
 }
 
-/* Estilo del botón */
-button {
-    background-color: #4CAF50; /* Verde */
-    color: white; /* Texto blanco */
-    border: none;
-    padding: 12px 20px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* Agregado efecto de transición */
-}
-
-button:hover {
-    background-color: #45a049; /* Verde oscuro al pasar el ratón */
-}

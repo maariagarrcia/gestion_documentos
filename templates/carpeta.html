@@ -252,6 +252,10 @@
                     archivoElemento.classList.add("list-group-item");
                     archivoElemento.textContent = archivo;
                     listaArchivos.appendChild(archivoElemento);
+                    archivoElemento.addEventListener("click", function () {
+                        displayFile(archivo);
+                    });
+
                 });
 
                 // Cerrar el modal después de agregar la carpeta
@@ -261,41 +265,32 @@
             }
         }
 
-        function uploadFile() {
-            const fileInput = document.getElementById('fileInput');
-            const file = fileInput.files[0];
 
-            if (!file) {
-                alert('Seleccione un archivo primero.');
-                return;
-            }
+        async function uploadFile() {
+             const fileInput = document.getElementById('fileInput');
+             const file = fileInput.files[0];       
 
-            const formData = new FormData();
-            formData.append('file', file);  // Usar 'file' en lugar de 'upload_file'
+             if (!file) {
+                 alert('Seleccione un archivo primero.');
+                 return;
+             }      
 
-            const user_id = getCookie("user_id");
-            const carpeta = getCookie("carpeta");
+             const formData = new FormData();
+             formData.append('file', file);  // Usar 'file' en lugar de 'upload_file'       
 
-            fetch(`http://127.0.0.1:8000/file/uploadfile/${user_id}/${carpeta}`, {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Handle the server response
-                if (data.filename) {
-                    displayUploadedFile(data.filename);
-                } else {
-                    alert('Error al subir el archivo.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al subir el archivo.');
-            });
-        }
+             const user_id = getCookie("user_id");
+             const carpeta = getCookie("carpeta");      
 
-    
+             fetch(`http://127.0.0.1:8000/file/uploadfile/${user_id}/${carpeta}`, {
+                 method: 'POST',
+                 body: formData,
+             })
+             .then(response => response.json())
+             .catch(error => {
+                 console.error('Error:', error);
+                 alert('Error al subir el archivo.');
+             });
+         }    
         function displayUploadedFile(filename) {
             // Construct the correct URL without the /templates path
             const imageUrl = `http://127.0.0.1:8000/${filename}`;
@@ -322,7 +317,7 @@
         </div>
     </header>
 
-    <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
         <a class="navbar-brand" href="/templates/index.html">Inicio</a>
         <a  class="navbar-brand" href="/templates/carpeta.html" >Carpetas</a>
         <div id="n">
@@ -347,6 +342,7 @@
         <button onclick="cerrar_sesion()" class="btn btn-danger btn-sm">Cerrar Sesión</button>
     </div>
 </nav>
+
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-3">
@@ -372,7 +368,6 @@
                         <input type="file" id="fileInput"/>
                         <button onclick="uploadFile()">Subir Archivo</button>
                         <div id="uploadedFiles"></div>
-
 
                     </div>
                 </div>
