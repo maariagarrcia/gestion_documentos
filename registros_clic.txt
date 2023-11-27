@@ -10,3 +10,5 @@ User ID: 2, Elemento: 3, Tipo: carpeta
 User ID: 2, Elemento: 2, Tipo: carpeta
 User ID: 2, Elemento: 1, Tipo: carpeta
 User ID: 2, Elemento: EuCVkn.jpeg, Tipo: archivo
+User ID: 2, Elemento: 2, Tipo: carpeta
+User ID: 2, Elemento: UctqEM.jpeg, Tipo: archivo

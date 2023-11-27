@@ -18,6 +18,7 @@ from auth import authentication
 from fastapi.responses import JSONResponse
 
 from schemas import RegistroClic
+from proxy import *
 
 
 
@@ -52,13 +53,12 @@ async def registrar_clic(registro: RegistroClic):
         # Formatear la información
         info = f"User ID: {registro.user_id}, Elemento: {registro.elemento}, Tipo: {registro.tipo}"
 
-        # Guardar la información en un archivo de texto
-        guardar_en_archivo(info)
+        # Guardar la información usando el proxy
+        proxy_guardador.guardar(info)
 
         return {"message": "Clic registrado con éxito"}
     except Exception as e:
         return {"error": str(e)}
-
 
 models.Base.metadata.create_all(engine)
 
