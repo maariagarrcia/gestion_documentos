@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pizzería deliciosamente suya</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link  type="text/css" rel="stylesheet" href="/static/css/styles.css">
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to get a cookie value by name
+            function getCookie(cname) {
+                let name = cname + "=";
+                let decodedCookie = decodeURIComponent(document.cookie);
+                let ca = decodedCookie.split(';');
+                for(let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
+                }
+                return "";
+            }
+
+            const username = getCookie("username");
+
+            // Get the elements
+            const userContainer = document.getElementById("success-message");
+            const usernameElement = document.getElementById("username");
+            const navbarNav = document.getElementById("n");
+            const logoutContainer = document.getElementById("logout-container");
+            const navbar = document.getElementById("navbar");
+
+            if (username !== "") {
+                // If a user is logged in, display the username and hide the navigation bar
+                userContainer.style.display = "block";
+                usernameElement.innerText = username;
+                navbarNav.style.display = "none";
+                logoutContainer.style.display = "block";
+                navbar.style.display = "block";
+
+                
+            } else {
+                // If no user is logged in, hide the user-container and show the navigation bar
+                userContainer.style.display = "none";
+                navbarNav.style.display = "block";
+                logoutContainer.style.display = "none";
+                navbar.style.display = "none";
+
+            }
+        });
+
+        function cerrar_sesion() {
+            document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = "/templates/login.html";
+        }   
+
+    </script>
+</head>
+<body>
+    <header>
+        <div>
+            <h1>GESTIÓN DE DOCUMENTOS</h1>
+        </div>
+    </header>
+
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
+    <a class="navbar-brand" href="/templates/index.html">Inicio</a>
+    <a class="navbar-brand" href="/templates/carpeta.html">Carpeta</a>
+    <div id="n">
+    <ul class="navbar-nav ml-4" >
+        <li class="nav-item">
+            <a class="nav-link" href="/templates/inicio.html">Iniciar Sesión</a>
+        </li>
+        <li class="nav-item ml-3">
+            <a class="nav-link" href="/templates/registroo.html">Regístrate</a>
+        </li>
+    </ul>
+    </div>
+
+    <div id="success-message" style="display: none;">
+        <div id="user-container" style="border: 1px solid #dc3545;  background-color: #dc3545  ; border-radius: 4px;">
+        <span id="username" style="color: white; font-size: 14px; font-weight: bold;"></span>
+        </div>
+    </div>
+
+    <div id="logout-container" style="display: none; ">
+        <span id="username" style="color: white;"></span>
+        <button onclick="cerrar_sesion()" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+    </div>
+
+</nav>
+</body>
+</html>

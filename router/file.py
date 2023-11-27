@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File, Request
 from sqlalchemy.orm import Session
 
 
@@ -19,6 +19,9 @@ from auth.oauth2 import get_current_user
 
 from fastapi.responses import JSONResponse
 import os
+
+from composite import Archivo, Carpeta
+
 
 router = APIRouter(
     prefix="/file",
@@ -75,6 +78,7 @@ async def upload_file(carpeta_id:int,file: UploadFile = File(...),db: Session = 
         
     elif file_ext in {".txt", ".docx", ".doc", ".odt", ".rtf", ".tex", ".wks", ".wps", ".wpd"}:
         file_path = f"files/docs/text/{new_filename}"
+    
     else:
         return {"error": "Tipo de archivo no reconocido"}
 
@@ -98,3 +102,37 @@ async def upload_file(carpeta_id:int,file: UploadFile = File(...),db: Session = 
 async def delete_file(id: int, db: Session = Depends(get_db), current_user: UserAuth = Depends(get_current_user)):
     file = db_file.CrudFile.delete_file(id, db, current_user.id)
     return {"message": "ok"}
+
+@router.get('/get_documento/{documento_id}')
+async def get_documento(request: Request, documento_id: int, db: Session = Depends(get_db)):
+    # Obtener el documento y sus componentes de la base de datos
+    db_documento = db.query(DbCarpeta).filter(DbCarpeta.id == documento_id).first()
+
+    # Verificar si el documento existe
+    if not db_documento:
+        raise HTTPException(status_code=404, detail="Documento no encontrado")
+
+    # Si el documento es una hoja (tipo 0), simplemente crea un archivo
+    if db_documento.tipo == 0:
+        componente = Archivo(nombre=db_documento.nombre)
+        detalles_documento = componente.obtener_detalles()
+
+    elif db_documento.tipo == 1:
+        # Si el documento es una composición (tipo diferente de 0), crea una carpeta
+        carpeta = Carpeta(nombre=db_documento.nombre)
+
+        # Obtén todos los componentes asociados al documento
+        db_componentes = db.query(DbFile).filter(DbFile.carpeta_id == documento_id).all()
+        for db_componente in db_componentes:
+            if db_componente.tipo == 0:
+                componente = Archivo(nombre=db_componente.nombre)
+            else:
+                componente = Carpeta(nombre=db_componente.nombre)
+
+            carpeta.agregar_componente(componente)
+
+        # Obtener los detalles de la carpeta utilizando el patrón Composite
+        detalles_documento = carpeta.obtener_detalles()
+
+    # Devuelve los detalles del documento para mostrarlos en la página web
+    return detalles_documento

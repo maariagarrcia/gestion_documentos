@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from db.models import DbCarpeta, DbFile
 from schemas import User, CarpetaDisplayModel
 from sqlalchemy.orm import Session
+from composite import Archivo, Carpeta
+from db import db_carpeta
 
 
 class CrudCarpetaInterface(ABC):
@@ -54,8 +56,10 @@ class CrudCarpeta(CrudCarpetaInterface):
         carpeta = CarpetaDisplayModel(
             id=carpeta.id,nombre=carpeta.nombre, tamaño=carpeta.tamaño, user=userr, archivos=archivos)
         return carpeta
-
-
+    
+    @staticmethod
+    def get_carpeta_comp(db: Session, id: int):
+        pass
     @staticmethod
     def get_all_carpeta(db: Session):
         carpetas = db.query(DbCarpeta).all()

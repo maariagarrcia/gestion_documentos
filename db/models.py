@@ -45,6 +45,8 @@ class DbFile(Base):
     carpeta_id = Column(Integer, ForeignKey("carpeta.id"))
     carpeta = relationship("DbCarpeta", back_populates="archivos")
 
+    tipo = 0
+
 
 class DbCarpeta(Base):
     __tablename__ = "carpeta"
@@ -59,3 +61,5 @@ class DbCarpeta(Base):
 
     # Relación uno a muchos (one-to-many) con DbFile
     archivos = relationship("DbFile", back_populates="carpeta")
+
+    tipo = 1

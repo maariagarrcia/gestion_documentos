@@ -1,0 +1,85 @@
+body {
+    background-color: #f0f0f0; /* Gris claro */
+    color: #333; /* Texto negro */
+    font-family: 'Arial', sans-serif; /* Tipo de fuente predeterminado */
+    margin: 0;
+}
+
+header {
+    background-color: #333; /* Negro */
+    text-align: center;
+    padding: 20px;
+}
+
+h1 {
+    margin: 0;
+    color: white; /* Texto blanco */
+}
+
+nav {
+    background-color: #333; /* Negro */
+    color: white;
+    padding: 10px;
+}
+
+#success-message {
+    display: none;
+}
+
+#user-container {
+    border: 1px solid #555; 
+    padding: 5px;
+    background-color: #555; /* Gris oscuro */
+    border-radius: 4px;
+    margin-left: 10px;
+}
+
+#username {
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#logout-container {
+    display: none;
+    margin-left: 10px;
+}
+
+#login-form {
+    background-color: #fff; /* Fondo blanco */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    width: 300px;
+    margin: 20px auto;
+}
+
+label {
+    color: #555; /* Color del texto de la etiqueta */
+    font-weight: bold; /* Negrita */
+    display: block; /* Hace que las etiquetas estén en líneas separadas */
+    margin-bottom: 10px; /* Espaciado inferior para separar las etiquetas de los campos de entrada */
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+/* Estilo del botón */
+button {
+    background-color: #4CAF50; /* Verde */
+    color: white; /* Texto blanco */
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Agregado efecto de transición */
+}
+
+button:hover {
+    background-color: #45a049; /* Verde oscuro al pasar el ratón */
+}

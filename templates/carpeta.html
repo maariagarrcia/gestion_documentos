@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Documentos</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link type="text/css" rel="stylesheet" href="/static/css/style.css">
+    <link  type="text/css" rel="stylesheet" href="/static/css/styles.css">
     <script>
+        function cerrar_sesion() {
+            document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            window.location.href = "/templates/login.html";
+        }   
+
+
         function getCookie(cname) {
             let name = cname + "=";
             let decodedCookie = decodeURIComponent(document.cookie);
@@ -22,12 +29,14 @@
             }
             return "";
         }
+
         function setCookie(cname, cvalue, exdays) {
           const d = new Date();
           d.setTime(d.getTime() + (exdays*24*60*60*1000));
           let expires = "expires="+ d.toUTCString();
           document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
         }
+        
         let carpetasPorPagina = 9;
         let paginaActual = 1;
         let totalCarpetas = 0;
@@ -103,16 +112,68 @@
         }
 
         async function cargar_contenido_carpeta(carpeta) {
-            // Aquí deberías realizar una llamada al servidor para obtener los archivos de la carpeta seleccionada
-            // y luego actualizar la lista de archivos en la interfaz.
-            // Por ahora, simplemente se muestra un mensaje en la consola.
-            console.log(`Cargando contenido de la carpeta: ${carpeta}`);
+            try {
+                // Realizar una llamada al servidor para obtener los archivos de la carpeta seleccionada
+                const response = await fetch(`http://127.0.0.1:8000/file/get_documento/${carpeta}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
 
-            // Actualizar la carpeta actual en la interfaz
-            document.getElementById("carpeta-actual").innerText = `Carpeta Actual: ${carpeta}`;
-            setCookie("carpeta", carpeta, 1);
+                const documentos = await response.json();
 
+                // Actualizar la carpeta actual en la interfaz
+                document.getElementById("carpeta-actual").innerText = `Carpeta Actual: ${carpeta}`;
+                setCookie("carpeta", carpeta, 1);
+
+                // Actualizar la lista de archivos en la interfaz
+                const listaArchivos = document.getElementById("listaArchivos");
+                listaArchivos.innerHTML = "";
+
+                documentos.forEach(documento => {
+                    const documentoElemento = document.createElement("li");
+                    documentoElemento.classList.add("list-group-item");
+                    documentoElemento.textContent = documento;
+                    listaArchivos.appendChild(documentoElemento).addEventListener("click", function () {
+                        displayFile(documento);
+                    });
+
+                });
+            } catch (error) {
+                console.error('Error:', error);
+            }
+            
         }
+
+        function displayFile(documento) {
+            // Eliminar espacios en blanco al principio o al final del nombre del archivo
+            const nombreArchivo = documento.trim().replace("Archivo:", "");
+
+            // Reemplazar espacios en blanco con %20 en la URL
+            const nombreArchivoUrl = nombreArchivo.replace(/\s+/g, "");
+
+            // Obtener la extensión del archivo
+            const extension = nombreArchivo.toLowerCase().split('.').pop();
+
+            // Determinar el tipo de archivo
+            let tipoArchivo = "otros";
+            if (["png", "jpg", "jpeg", "gif", "bmp", "ico", "webp"].includes(extension)) {
+                tipoArchivo = "images";
+            } else if (["mp4", "avi", "mkv", "mov", "wmv", "flv", "webm"].includes(extension)) {
+                tipoArchivo = "videos";
+            } else if (["txt", "docx", "doc", "odt", "rtf", "tex", "wks", "wps", "wpd"].includes(extension)) {
+                tipoArchivo = "docs/text";
+            } else if (["pdf"].includes(extension)) {
+                tipoArchivo = "docs/pdf";
+            }
+
+            // Construir la URL completa
+            const baseUrl = `http://127.0.0.1:8000/files/${tipoArchivo}/`;
+            const fileUrl = `${baseUrl}${nombreArchivoUrl}`;
+
+            // Abrir la URL en una nueva pestaña
+            window.open(fileUrl, '_blank');
+        }
+
 
         async function crear_carpeta() {
             var nombre = document.getElementById("nombreCarpeta").value;
@@ -167,55 +228,82 @@
             }
         }
 
-function uploadFile() {
-    const fileInput = document.getElementById('fileInput');
-    const file = fileInput.files[0];
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
 
-    if (!file) {
-        alert('Seleccione un archivo primero.');
-        return;
-    }
+            if (!file) {
+                alert('Seleccione un archivo primero.');
+                return;
+            }
 
-    const formData = new FormData();
-    formData.append('file', file);  // Usar 'file' en lugar de 'upload_file'
+            const formData = new FormData();
+            formData.append('file', file);  // Usar 'file' en lugar de 'upload_file'
 
-    const user_id = getCookie("user_id");
-    const carpeta = getCookie("carpeta");
+            const user_id = getCookie("user_id");
+            const carpeta = getCookie("carpeta");
 
-    fetch(`http://127.0.0.1:8000/file/uploadfile/${user_id}/${carpeta}`, {
-        method: 'POST',
-        body: formData,
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Handle the server response
-        if (data.filename) {
-            displayUploadedFile(data.filename);
-        } else {
-            alert('Error al subir el archivo.');
+            fetch(`http://127.0.0.1:8000/file/uploadfile/${user_id}/${carpeta}`, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the server response
+                if (data.filename) {
+                    displayUploadedFile(data.filename);
+                } else {
+                    alert('Error al subir el archivo.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al subir el archivo.');
+            });
         }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error al subir el archivo.');
-    });
-}
 
-function displayUploadedFile(filename) {
-    // Construct the correct URL without the /templates path
-    const imageUrl = `http://127.0.0.1:8000/${filename}`;
+    
+        function displayUploadedFile(filename) {
+            // Construct the correct URL without the /templates path
+            const imageUrl = `http://127.0.0.1:8000/${filename}`;
 
-    const fileLink = document.createElement('a');
-    fileLink.href = imageUrl;
-    fileLink.textContent = imageUrl; // You can modify this as needed
-    fileLink.target = '_blank'; // To open in a new tab
+            const fileLink = document.createElement('a');
+            fileLink.href = imageUrl;
+            fileLink.textContent = imageUrl; // You can modify this as needed
+            fileLink.target = '_blank'; // To open in a new tab
 
-    const lineBreak = document.createElement('br');
+            const lineBreak = document.createElement('br');
 
-    const uploadedFilesContainer = document.getElementById('uploadedFiles');
-    uploadedFilesContainer.appendChild(fileLink);
-    uploadedFilesContainer.appendChild(lineBreak);
-}
+            const uploadedFilesContainer = document.getElementById('uploadedFiles');
+            uploadedFilesContainer.appendChild(fileLink);
+            uploadedFilesContainer.appendChild(lineBreak);
+        }
+        
+        const username = getCookie("username");
+        const logoutContainer = document.getElementById("logout-container");
+        const userContainer = document.getElementById("success-message");
+        const usernameElement = document.getElementById("username");
+
+
+        const navbarNav = document.getElementById("n");
+        const navbar = document.getElementById("carp");
+
+
+        if (username !== "") {
+            // If a user is logged in, display the username and hide the navigation bar
+            userContainer.style.display = "block";
+            usernameElement.innerText = username;
+            navbarNav.style.display = "none";
+            logoutContainer.style.display = "block";
+            navbar.style.display = "block";
+            
+        } else {
+            userContainer.style.display = "none";
+            navbarNav.style.display = "block";
+            logoutContainer.style.display = "none";
+            navbar.style.display = "none";
+        }
+
 
     </script>
 </head>
@@ -227,29 +315,30 @@ function displayUploadedFile(filename) {
     </header>
 
     <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
-        <a class="navbar-brand" href="/templates/base.html">Inicio</a>
+        <a class="navbar-brand" href="/templates/index.html">Inicio</a>
+        <a class="navbar-brand" href="/templates/carpeta.html" id="carp" style="display:none;">Carpetas</a>
         <div id="n">
             <ul class="navbar-nav ml-4">
                 <li class="nav-item">
-                    <a class="nav-link" href="/templates/login.html">Iniciar Sesión</a>
+                    <a class="nav-link" href="/templates/inicio.html">Iniciar Sesión</a>
                 </li>
                 <li class="nav-item ml-3">
-                    <a class="nav-link" href="/templates/register.html">Regístrate</a>
+                    <a class="nav-link" href="/templates/registro.html">Regístrate</a>
                 </li>
             </ul>
         </div>
 
-        <div id="success-message" style="display: none;">
-            <div id="user-container" style="border: 1px solid #dc3545;  background-color: #dc3545  ; border-radius: 4px;">
-                <span id="username" style="color: white; font-size: 14px; font-weight: bold;"></span>
-            </div>
+    <div id="success-message" style="display: none;">
+        <div id="user-container" style="border: 1px solid #dc3545;  background-color: #dc3545  ; border-radius: 4px;">
+        <span id="username" style="color: white; font-size: 14px; font-weight: bold;"></span>
         </div>
+    </div>
 
-        <div id="logout-container" style="display: none; ">
-            <span id="username" style="color: white;"></span>
-            <button onclick="cerrar_sesion()" class="btn btn-danger btn-sm">Cerrar Sesión</button>
-        </div>
-    </nav>
+    <div id="logout-container" style="display: none; ">
+        <span id="username" style="color: white;"></span>
+        <button onclick="cerrar_sesion()" class="btn btn-danger btn-sm">Cerrar Sesión</button>
+    </div>
+</nav>
     <div class="container mt-4">
         <div class="row">
             <div class="col-md-3">
