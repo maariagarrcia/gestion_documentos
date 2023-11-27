@@ -12,8 +12,9 @@
         function cerrar_sesion() {
             document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = "/templates/login.html";
-        } 
+            window.location.href = "/templates/inicio.html";
+        }
+
         async function send() {
             var user = document.getElementById("user").value;
             var password = document.getElementById("password").value;
@@ -33,6 +34,8 @@
             
             const navbar = document.getElementById("navbar");
             navbar.style.display = "none";
+            document.getElementById("c").style.display = "none";
+
             if (response.status === 200) {
                 const data = await response.json();
                 const username = data.username;  // Asumiendo que el nombre de usuario se encuentra en 'data' con la clave 'username'
@@ -48,6 +51,7 @@
                 document.getElementById("n").style.display = "none";
                 document.getElementById("navbar").style.display = "block";
                 logoutContainer.style.display = "block";
+                document.getElementById("c").style.display = "block";
 
             }
 
@@ -69,6 +73,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
     <a class="navbar-brand" href="/templates/index.html">Inicio</a>
+    <a id="c" class="navbar-brand" href="/templates/carpeta.html" >Carpetas</a>
 
     <div id="n">
     <ul class="navbar-nav ml-4" >

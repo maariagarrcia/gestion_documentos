@@ -34,6 +34,7 @@
             const navbarNav = document.getElementById("n");
             const logoutContainer = document.getElementById("logout-container");
             const navbar = document.getElementById("navbar");
+            const carpeta = document.getElementById("c");
 
             if (username !== "") {
                 // If a user is logged in, display the username and hide the navigation bar
@@ -42,6 +43,7 @@
                 navbarNav.style.display = "none";
                 logoutContainer.style.display = "block";
                 navbar.style.display = "block";
+                carpeta.style.display = "block";
 
                 
             } else {
@@ -50,6 +52,7 @@
                 navbarNav.style.display = "block";
                 logoutContainer.style.display = "none";
                 navbar.style.display = "none";
+                carpeta.style.display = "none";
 
             }
         });
@@ -57,7 +60,7 @@
         function cerrar_sesion() {
             document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = "/templates/login.html";
+            window.location.href = "/templates/inicio.html";
         }   
 
     </script>
@@ -71,14 +74,14 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
     <a class="navbar-brand" href="/templates/index.html">Inicio</a>
-    <a class="navbar-brand" href="/templates/carpeta.html">Carpeta</a>
+    <a  id="c" class="navbar-brand" href="/templates/carpeta.html">Carpeta</a>
     <div id="n">
     <ul class="navbar-nav ml-4" >
         <li class="nav-item">
             <a class="nav-link" href="/templates/inicio.html">Iniciar Sesión</a>
         </li>
         <li class="nav-item ml-3">
-            <a class="nav-link" href="/templates/registroo.html">Regístrate</a>
+            <a class="nav-link" href="/templates/registro.html">Regístrate</a>
         </li>
     </ul>
     </div>

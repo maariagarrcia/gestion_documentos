@@ -48,7 +48,7 @@ ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", "
 
 
 @router.post("/uploadfile/{user_id}/{carpeta_id}")
-async def upload_file(carpeta_id:int,file: UploadFile = File(...),db: Session = Depends(get_db)):
+async def upload_file(carpeta_id:int, file: UploadFile = File(...),db: Session = Depends(get_db)):
     # Verifica si la carpeta existe
     carpeta = db.query(DbCarpeta).filter(DbCarpeta.id == carpeta_id).first()
 
@@ -90,7 +90,7 @@ async def upload_file(carpeta_id:int,file: UploadFile = File(...),db: Session = 
     file_size = file.file.tell()
 
     # Guarda la información del archivo en la base de datos (you may need to adjust this part based on your model structure)
-    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=1, carpeta_id=carpeta.id)
+    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=1, carpeta_id=carpeta.id, tipo=0)
     db.add(new_file)
     db.commit()
 

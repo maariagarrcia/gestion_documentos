@@ -10,25 +10,58 @@
         function cerrar_sesion() {
             document.cookie = "user_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
             document.cookie = "username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            window.location.href = "/templates/login.html";
+            window.location.href = "/templates/inicio.html";
         }   
 
-
-        function getCookie(cname) {
-            let name = cname + "=";
-            let decodedCookie = decodeURIComponent(document.cookie);
-            let ca = decodedCookie.split(';');
-            for (let i = 0; i < ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
+        document.addEventListener("DOMContentLoaded", function() {
+            // Function to get a cookie value by name
+            function getCookie(cname) {
+                let name = cname + "=";
+                let decodedCookie = decodeURIComponent(document.cookie);
+                let ca = decodedCookie.split(';');
+                for(let i = 0; i < ca.length; i++) {
+                    let c = ca[i];
+                    while (c.charAt(0) == ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(name) == 0) {
+                        return c.substring(name.length, c.length);
+                    }
                 }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
+                return "";
             }
-            return "";
-        }
+
+            const username = getCookie("username");
+
+            // Get the elements
+            const userContainer = document.getElementById("success-message");
+            const usernameElement = document.getElementById("username");
+            const navbarNav = document.getElementById("n");
+            const logoutContainer = document.getElementById("logout-container");
+            const navbar = document.getElementById("navbar");
+            const carpeta = document.getElementById("carp");
+
+            if (username !== "") {
+                // If a user is logged in, display the username and hide the navigation bar
+                userContainer.style.display = "block";
+                usernameElement.innerText = username;
+                navbarNav.style.display = "none";
+                logoutContainer.style.display = "block";
+                navbar.style.display = "block";
+                carpeta.style.display = "block";
+
+                
+            } else {
+                // If no user is logged in, hide the user-container and show the navigation bar
+                userContainer.style.display = "none";
+                navbarNav.style.display = "block";
+                logoutContainer.style.display = "none";
+                navbar.style.display = "none";
+                carpeta.style.display = "none";
+
+            }
+        });
+
 
         function setCookie(cname, cvalue, exdays) {
           const d = new Date();
@@ -279,31 +312,6 @@
             uploadedFilesContainer.appendChild(lineBreak);
         }
         
-        const username = getCookie("username");
-        const logoutContainer = document.getElementById("logout-container");
-        const userContainer = document.getElementById("success-message");
-        const usernameElement = document.getElementById("username");
-
-
-        const navbarNav = document.getElementById("n");
-        const navbar = document.getElementById("carp");
-
-
-        if (username !== "") {
-            // If a user is logged in, display the username and hide the navigation bar
-            userContainer.style.display = "block";
-            usernameElement.innerText = username;
-            navbarNav.style.display = "none";
-            logoutContainer.style.display = "block";
-            navbar.style.display = "block";
-            
-        } else {
-            userContainer.style.display = "none";
-            navbarNav.style.display = "block";
-            logoutContainer.style.display = "none";
-            navbar.style.display = "none";
-        }
-
 
     </script>
 </head>
@@ -316,7 +324,7 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark justify-content-center">
         <a class="navbar-brand" href="/templates/index.html">Inicio</a>
-        <a class="navbar-brand" href="/templates/carpeta.html" id="carp" style="display:none;">Carpetas</a>
+        <a  class="navbar-brand" href="/templates/carpeta.html" >Carpetas</a>
         <div id="n">
             <ul class="navbar-nav ml-4">
                 <li class="nav-item">
@@ -361,7 +369,7 @@
                         <ul class="list-group" id="listaArchivos">
                             <!-- Puedes generar dinámicamente estos archivos desde tu backend -->
                         </ul>
-                        <input type="file" id="fileInput" />
+                        <input type="file" id="fileInput"/>
                         <button onclick="uploadFile()">Subir Archivo</button>
                         <div id="uploadedFiles"></div>
 
