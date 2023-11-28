@@ -1,4 +1,4 @@
-gestion_documentos
+GESTOR DE DOCUMENTOS
 -------------------
  
  - **Document (Documento):**
