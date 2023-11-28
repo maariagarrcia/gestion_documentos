@@ -4,7 +4,7 @@ class Componente:
     """
     Clase base para el patrón Composite
     """
-    def obtener_detalles(self) -> str:
+    def obtener_detalles(self) -> List[str]:
         """
         Método para obtener detalles específicos del componente
         """
@@ -18,18 +18,18 @@ class Componente:
 
 class Archivo(Componente):
     nombre: str
+    tamaño: int
 
-    def __init__(self, nombre: str):
+    def __init__(self, nombre: str, tamaño: int):
         self.nombre = nombre
-        self.tamaño =tamaño
+        self.tamaño = tamaño
 
     def obtener_detalles(self) -> List[str]:
         return [f"Archivo: {self.nombre}"]
     
     def obtener_tamaño(self) -> int:
-        return [f"Archivo: {self.tamaño}"]
+        return self.tamaño
     
-        
 
 class Carpeta(Componente):
     nombre: str
@@ -47,6 +47,13 @@ class Carpeta(Componente):
         for componente in self.contenido:
             detalles.extend(componente.obtener_detalles())
         return detalles
+    
+    def obtener_tamaño(self) -> int:
+        tamaño = 0
+        for componente in self.contenido:
+            tamaño += componente.obtener_tamaño()
+        return tamaño
+
 
 # Ejemplo de uso
 #if __name__ == "__main__":

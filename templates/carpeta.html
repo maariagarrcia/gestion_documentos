@@ -76,19 +76,21 @@
                     }
                 }
                 return "";
-            }
+        }
 
+     
+                
         function setCookie(cname, cvalue, exdays) {
           const d = new Date();
           d.setTime(d.getTime() + (exdays*24*60*60*1000));
           let expires = "expires="+ d.toUTCString();
           document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
         }
-        
+
         let carpetasPorPagina = 9;
         let paginaActual = 1;
         let totalCarpetas = 0;
-
+ 
         document.addEventListener("DOMContentLoaded", async function () {
             await cargar_carpetas_iniciales();
             document.getElementById("siguienteBtn").addEventListener("click", function () {
@@ -159,51 +161,60 @@
             divBotones.appendChild(btnSiguiente);
         }
 
-async function cargar_contenido_carpeta(carpeta) {
-    try {
-        // Realizar una llamada al servidor para obtener los archivos de la carpeta seleccionada
-        const response = await fetch(`http://127.0.0.1:8000/file/get_documento/${carpeta}`);
+        async function cargar_contenido_carpeta(carpeta) {
+            try {
+                // Realizar una llamada al servidor para obtener los detalles y tamaño de la carpeta seleccionada
+                const response = await fetch(`http://127.0.0.1:8000/file/get_documento/${carpeta}`);
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const documentos = data.detalles; // Cambiar según la nueva estructura de la respuesta
+                const tamañoCarpeta = data.tamaño; // Asegúrate de que la propiedad sea la correcta
+
+                // Registro del clic en la carpeta
+
+                // Actualizar la carpeta actual en la interfaz
+                document.getElementById("carpeta-actual").innerText = `Carpeta Actual: ${carpeta}`;
+                setCookie("carpeta", carpeta, 1);
+
+                // quiero que carpeta sea un string
+                const carpeta_str = carpeta.toString();
+
+                // Realizar el registro del clic
+                const clicResponse = await registrarClic(carpeta_str, 'carpeta');
+
+                console.log('Clic Response:', clicResponse); // Agregado para depuración
+
+                // Si registrarClic devuelve un código de estado 200, continuar con el resto del código
+                // Actualizar la lista de archivos en la interfaz
+                const listaArchivos = document.getElementById("listaArchivos");
+                listaArchivos.innerHTML = "";
+
+                // Crear un elemento para mostrar solo el tamaño de la carpeta
+                const tamañoCarpetaElemento = document.createElement("li");
+                tamañoCarpetaElemento.classList.add("list-group-item");
+                tamañoCarpetaElemento.textContent = `Tamaño total de la carpeta: ${tamañoCarpeta} bytes`;
+                listaArchivos.appendChild(tamañoCarpetaElemento);
+
+                // Iterar sobre los documentos y agregar elementos a la lista
+                documentos.forEach(documento => {
+                    const documentoElemento = document.createElement("li");
+                    documentoElemento.classList.add("list-group-item");
+                    documentoElemento.textContent = documento;
+                    listaArchivos.appendChild(documentoElemento).addEventListener("click", function () {
+                        displayFile(documento);
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
         }
 
-        const documentos = await response.json();
 
-        // Registro del clic en la carpeta
-
-        // Actualizar la carpeta actual en la interfaz
-        document.getElementById("carpeta-actual").innerText = `Carpeta Actual: ${carpeta}`;
-        setCookie("carpeta", carpeta, 1);
-
-        // quiero que carpeta sea un string
-        const carpeta_str = carpeta.toString();
-
-        // Realizar el registro del clic
-        const clicResponse = await registrarClic(carpeta_str, 'carpeta');
-        
-        console.log('Clic Response:', clicResponse); // Agregado para depuración
-
-
-        // Si registrarClic devuelve un código de estado 200, continuar con el resto del código
-        // Actualizar la lista de archivos en la interfaz
-        const listaArchivos = document.getElementById("listaArchivos");
-        listaArchivos.innerHTML = "";
-        documentos.forEach(documento => {
-            const documentoElemento = document.createElement("li");
-            documentoElemento.classList.add("list-group-item");
-            documentoElemento.textContent = documento;
-            listaArchivos.appendChild(documentoElemento).addEventListener("click", function () {
-                displayFile(documento);
-            });
-        });
-        
-
-        
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
         function displayFile(documento) {
             // Eliminar espacios en blanco al principio o al final del nombre del archivo
             const nombreArchivo = documento.trim().replace("Archivo:", "");
@@ -360,37 +371,90 @@ async function cargar_contenido_carpeta(carpeta) {
         uploadedFilesContainer.appendChild(lineBreak);
         }
 
-async function registrarClic(elemento, tipo) {
-    try {
-        // Realizar una llamada al servidor para registrar el clic
-        const response = await fetch('http://127.0.0.1:8000/registrar_clic', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                user_id: getCookie("user_id"), // Cambia esto con el ID de usuario correcto
-                elemento: elemento,
-                tipo: tipo,
-            }),
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        async function registrarClic(elemento, tipo) {
+            try {
+                // Realizar una llamada al servidor para registrar el clic
+                const response = await fetch('http://127.0.0.1:8000/registrar_clic', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_id: getCookie("user_id"), // Cambia esto con el ID de usuario correcto
+                        elemento: elemento,
+                        tipo: tipo,
+                    }),
+                });
+        
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+        
+                const data = await response.json();
+                console.log('Clic registrado con éxito:', data.message);
+            } catch (error) {
+                if (error instanceof PermissionDeniedException) {
+                    // Manejar la excepción específica de permisos denegados
+                    alert("No tienes permisos para registrar clics. Acceso bloqueado.");
+                    // Aquí puedes realizar otras acciones, como bloquear otras operaciones
+                } else {
+                    console.error('Error al registrar clic:', error);
+                }
+            }
         }
+        
+    async function buscar() {
+        // Obtener el valor del campo de búsqueda
+        const searchTerm = document.getElementById("pedidoId").value;
 
-        const data = await response.json();
-        console.log('Clic registrado con éxito:', data.message);
-    } catch (error) {
-        if (error instanceof PermissionDeniedException) {
-            // Manejar la excepción específica de permisos denegados
-            alert("No tienes permisos para registrar clics. Acceso bloqueado.");
-            // Aquí puedes realizar otras acciones, como bloquear otras operaciones
-        } else {
-            console.error('Error al registrar clic:', error);
+        // Realizar la llamada a la API usando Fetch o la biblioteca que prefieras
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/file/get_file/${searchTerm}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Resultado de la búsqueda:', data);
+
+            // Construir el contenido del modal con los datos obtenidos
+            const modalContent = `
+                <p>ID: ${data.id}</p>
+                <p>Nombre: ${data.nombre}</p>
+                <p>URL: ${data.url}</p>
+                <p>Tamaño: ${data.tamaño} bytes</p>
+                <p>Tipo URL: ${data.tipo_url}</p>
+                <p>Carpeta ID: ${data.carpeta_id}</p>
+            `;
+
+            // Mostrar el modal con el contenido
+            abrirModal(modalContent);
+            
+            // Aquí puedes manipular los datos recibidos según tus necesidades
+        } catch (error) {
+            console.error('Error en la búsqueda:', error);
+
+            // En caso de error, mostrar un mensaje de error en el modal
+            const errorMessage = `Error en la búsqueda: ${error.message}`;
+            abrirModal(errorMessage);
         }
     }
-}
+
+    // Función para abrir el modal
+    function abrirModal(content) {
+        const modal = document.getElementById("myModal");
+        const modalContent = document.getElementById("modalContent");
+        
+        modalContent.innerHTML = content;
+        modal.style.display = "block";
+    }
+
+    // Función para cerrar el modal
+    function cerrarModal() {
+        const modal = document.getElementById("myModal");
+        modal.style.display = "none";
+    }
+
 
     </script>
 </head>
@@ -427,12 +491,28 @@ async function registrarClic(elemento, tipo) {
     </div>
 </nav>
 
+
+<div id="myModal" class="modal">
+    <!-- Contenido del modal -->
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModal()">&times;</span>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<!-- Modifica el botón para agregar una clase para estilos si lo necesitas -->
+<input type="text" id="pedidoId" name="pedidoId" placeholder="Ingrese el término de búsqueda para un archivo" style="margin-top: 40px; width: 800px; margin-left: 300px;">
+<button onclick="buscar()" class="btn">Buscar</button>
+
     <div class="container mt-4">
         <div class="row">
+
+
+
             <div class="col-md-3">
                 <!-- Barra lateral (izquierda) -->
                 <div class="list-group">
-                <a href="#" class="list-group-item list-group-item-action active" style="background-color: #dc3545; color: white; border-color: #dc3545; margin-top:28px;">Mis Carpetas</a>
+                <a href="#" class="list-group-item list-group-item-action active" style="background-color: #dc3545; color: white; border-color: #dc3545; margin-top:18px;">Mis Carpetas</a>
                     <div class="list-group" id="listaCarpetas" style="border-top-left-radius: 0;border-top-right-radius: 0;">
                         <!-- Puedes generar dinámicamente estas carpetas desde tu backend -->
 
@@ -444,7 +524,7 @@ async function registrarClic(elemento, tipo) {
                 <!-- Contenido principal (derecha) -->
                         <div class="list-group">
 
-                        <a href="#" id="carpeta-actual" class="list-group-item list-group-item-action active" style="background-color: #dc3545; color: white; border-color: #dc3545; margin-top:28px;">Carpeta Actual</a>
+                        <a href="#" id="carpeta-actual" class="list-group-item list-group-item-action active" style="background-color: #dc3545; color: white; border-color: #dc3545; margin-top:18px;">Carpeta Actual</a>
                         <!-- <h2 id="carpeta-actual">Carpeta Actual: </h2>-->
                         <ul class="list-group" id="listaArchivos" style="border-top-left-radius: 0;border-top-right-radius: 0;" >
                             <!-- Puedes generar dinámicamente estos archivos desde tu backend -->

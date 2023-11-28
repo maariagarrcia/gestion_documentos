@@ -48,7 +48,7 @@ ALLOWED_EXTENSIONS = {".png", ".jpg", ".jpeg", ".gif", ".mp4", ".avi", ".mkv", "
 
 
 @router.post("/uploadfile/{user_id}/{carpeta_id}")
-async def upload_file(carpeta_id:int, file: UploadFile = File(...),db: Session = Depends(get_db)):
+async def upload_file(carpeta_id:int,file: UploadFile = File(...),db: Session = Depends(get_db)):
     # Verifica si la carpeta existe
     carpeta = db.query(DbCarpeta).filter(DbCarpeta.id == carpeta_id).first()
 
@@ -90,7 +90,7 @@ async def upload_file(carpeta_id:int, file: UploadFile = File(...),db: Session =
     file_size = file.file.tell()
 
     # Guarda la información del archivo en la base de datos (you may need to adjust this part based on your model structure)
-    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=1, carpeta_id=carpeta.id)
+    new_file = DbFile(nombre=new_filename, tamaño=file_size, url=file_path, tipo_url=file_ext, user_id=1, carpeta_id=carpeta.id, tipo=0)
     db.add(new_file)
     db.commit()
 
@@ -103,6 +103,18 @@ async def delete_file(id: int, db: Session = Depends(get_db), current_user: User
     file = db_file.CrudFile.delete_file(id, db, current_user.id)
     return {"message": "ok"}
 
+@router.get("/get_file/{id}")
+async def get_file(id: int, db: Session = Depends(get_db)):
+    file = db_file.CrudFile.get_file(id, db)
+    return file
+
+@router.get("/get_files/{carpeta_id}")
+async def get_files(carpeta_id: int, db: Session = Depends(get_db)):
+    files = db_file.CrudFile.get_files(carpeta_id, db)
+    return files
+
+
+
 @router.get('/get_documento/{documento_id}')
 async def get_documento(request: Request, documento_id: int, db: Session = Depends(get_db)):
     # Obtener el documento y sus componentes de la base de datos
@@ -114,8 +126,11 @@ async def get_documento(request: Request, documento_id: int, db: Session = Depen
 
     # Si el documento es una hoja (tipo 0), simplemente crea un archivo
     if db_documento.tipo == 0:
-        componente = Archivo(nombre=db_documento.nombre)
-        detalles_documento = componente.obtener_detalles()
+        componente = Archivo(nombre=db_documento.nombre, tamaño=db_documento.tamaño)
+        detalles_documento = {
+            "detalles": componente.obtener_detalles(),
+            "tamaño": componente.obtener_tamaño() 
+        }
 
     elif db_documento.tipo == 1:
         # Si el documento es una composición (tipo diferente de 0), crea una carpeta
@@ -125,14 +140,17 @@ async def get_documento(request: Request, documento_id: int, db: Session = Depen
         db_componentes = db.query(DbFile).filter(DbFile.carpeta_id == documento_id).all()
         for db_componente in db_componentes:
             if db_componente.tipo == 0:
-                componente = Archivo(nombre=db_componente.nombre)
+                componente = Archivo(nombre=db_componente.nombre, tamaño=db_componente.tamaño)
             else:
                 componente = Carpeta(nombre=db_componente.nombre)
 
             carpeta.agregar_componente(componente)
 
-        # Obtener los detalles de la carpeta utilizando el patrón Composite
-        detalles_documento = carpeta.obtener_detalles()
+        # Obtener los detalles y el tamaño de la carpeta utilizando el patrón Composite
+        detalles_documento = {
+            "detalles": carpeta.obtener_detalles(),
+            "tamaño": carpeta.obtener_tamaño()
+        }
 
-    # Devuelve los detalles del documento para mostrarlos en la página web
-    return detalles_documento
+    # Devuelve los detalles y el tamaño del documento para mostrarlos en la página web
+    return JSONResponse(content=detalles_documento)

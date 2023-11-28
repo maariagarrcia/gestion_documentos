@@ -69,6 +69,21 @@ class CrudFile(CrudFileInterface):
         file.user_id = request.user_id
         db.commit()
         return file
+    
+    @staticmethod
+    def get_file(id:int, db: Session):
+        file = db.query(DbFile).filter(DbFile.id == id).first()
+        if not file:
+            raise HTTPException(status_code=404, detail="File not found")
+        return file
+    
+    @staticmethod
+    def get_files(carpeta_id:int, db: Session):
+        files = db.query(DbFile).filter(DbFile.carpeta_id == carpeta_id).all()
+        if not files:
+            raise HTTPException(status_code=404, detail="Files not found")
+        return files
+    
 
     @staticmethod
     def delete_file(id:int, db: Session, user_id: int):
