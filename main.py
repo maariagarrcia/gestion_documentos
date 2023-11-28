@@ -45,7 +45,6 @@ async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-
 @app.post("/registrar_clic")
 async def registrar_clic(registro: RegistroClic):
     info = f"User ID: {registro.user_id}, Elemento: {registro.elemento}, Tipo: {registro.tipo}"

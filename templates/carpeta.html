@@ -158,6 +158,7 @@
                     mostrar_carpetas_en_pagina(carpetas);
                 }
             });
+
             divBotones.appendChild(btnSiguiente);
         }
 
@@ -214,7 +215,6 @@
             }
         }
 
-
         function displayFile(documento) {
             // Eliminar espacios en blanco al principio o al final del nombre del archivo
             const nombreArchivo = documento.trim().replace("Archivo:", "");
@@ -225,33 +225,34 @@
             // Obtener la extensión del archivo
             const extension = nombreArchivo.toLowerCase().split('.').pop();
 
-            // Determinar el tipo de archivo
-            let tipoArchivo = "otros";
+
+
             if (["png", "jpg", "jpeg", "gif", "bmp", "ico", "webp"].includes(extension)) {
-                tipoArchivo = "images";
+                var tipoArchivo = "images";
             } else if (["mp4", "avi", "mkv", "mov", "wmv", "flv", "webm"].includes(extension)) {
-                tipoArchivo = "videos";
+                var tipoArchivo = "videos";
             } else if (["txt", "docx", "doc", "odt", "rtf", "tex", "wks", "wps", "wpd"].includes(extension)) {
-                tipoArchivo = "docs/text";
+                var tipoArchivo = "docs/text";
             } else if (["pdf"].includes(extension)) {
-                tipoArchivo = "docs/pdf";
+                var tipoArchivo = "docs/pdf";
             }
 
             // Construir la URL completa
-            const baseUrl = `http://127.0.0.1:8000/files/${tipoArchivo}/`;
+            const baseUrl = `http://127.0.0.1:5500/files/${tipoArchivo}/`;
             const fileUrl = `${baseUrl}${nombreArchivoUrl}`;
 
             // Realizar el registro del clic
-
-
             // Abrir la URL en una nueva pestaña
             window.open(fileUrl, '_blank');
+
+            // Abrir URl en la misma pestaña
+            // window.location.href = fileUrl; 
+
 
             // Registro del clic en el archivo
             registrarClic(nombreArchivo, 'archivo');
             
         }
-
 
         async function crear_carpeta() {
             var nombre = document.getElementById("nombreCarpeta").value;
@@ -310,23 +311,6 @@
             }
         }
 
-
-        function displayUploadedFile(filename) {
-            // Construct the correct URL without the /templates path
-            const imageUrl = `http://127.0.0.1:8000/${filename}`;
-
-            const fileLink = document.createElement('a');
-            fileLink.href = imageUrl;
-            fileLink.textContent = imageUrl; // You can modify this as needed
-            fileLink.target = '_blank'; // To open in a new tab
-
-            const lineBreak = document.createElement('br');
-
-            const uploadedFilesContainer = document.getElementById('uploadedFiles');
-            uploadedFilesContainer.appendChild(fileLink);
-            uploadedFilesContainer.appendChild(lineBreak);
-        }
-
         async function subir_archivo() {
             const fileInput = document.getElementById('fileInput');
             const file = fileInput.files[0];
@@ -355,21 +339,6 @@
 
         }
 
-        function displayUploadedFile(filename) {
-        // Construct the correct URL without the /templates path
-        const imageUrl = `http://127.0.0.1:8000/${filename}`;
-
-        const fileLink = document.createElement('a');
-        fileLink.href = imageUrl;
-        fileLink.textContent = imageUrl; // Puedes modificar esto según tus necesidades
-        fileLink.target = '_blank'; // Para abrir en una nueva pestaña
-
-        const lineBreak = document.createElement('br');
-
-        const uploadedFilesContainer = document.getElementById('uploadedFiles');
-        uploadedFilesContainer.appendChild(fileLink);
-        uploadedFilesContainer.appendChild(lineBreak);
-        }
 
         async function registrarClic(elemento, tipo) {
             try {
@@ -402,61 +371,98 @@
                 }
             }
         }
-        
-    async function buscar() {
-        // Obtener el valor del campo de búsqueda
-        const searchTerm = document.getElementById("pedidoId").value;
 
-        // Realizar la llamada a la API usando Fetch o la biblioteca que prefieras
-        try {
-            const response = await fetch(`http://127.0.0.1:8000/file/get_file/${searchTerm}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
+        async function buscar() {
+            // Obtener el valor del campo de búsqueda
+            const searchTerm = document.getElementById("pedidoId").value;
+
+            // Realizar la llamada a la API usando Fetch o la biblioteca que prefieras
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/file/get_file/${searchTerm}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Resultado de la búsqueda:', data);
+
+                // Construir el contenido del modal con los datos obtenidos
+                const modalContent = `
+                    <p>ID: ${data.id}</p>
+                    <p>Nombre: ${data.nombre}</p>
+                    <p>URL: ${data.url}</p>
+                    <p>Tamaño: ${data.tamaño} bytes</p>
+                    <p>Tipo URL: ${data.tipo_url}</p>
+                    <p>Carpeta ID: ${data.carpeta_id}</p>
+                `;
+
+                // Mostrar el modal con el contenido
+                abrirModal(modalContent);
+
+                // Aquí puedes manipular los datos recibidos según tus necesidades
+            } catch (error) {
+                console.error('Error en la búsqueda:', error);
+
+                // En caso de error, mostrar un mensaje de error en el modal
+                const errorMessage = `Error en la búsqueda: ${error.message}`;
+                abrirModal(errorMessage);
             }
+        }
 
-            const data = await response.json();
-            console.log('Resultado de la búsqueda:', data);
+        // Función para abrir el modal
+        function abrirModal(content) {
+            const modal = document.getElementById("myModal");
+            const modalContent = document.getElementById("modalContent");
 
-            // Construir el contenido del modal con los datos obtenidos
-            const modalContent = `
-                <p>ID: ${data.id}</p>
-                <p>Nombre: ${data.nombre}</p>
-                <p>URL: ${data.url}</p>
-                <p>Tamaño: ${data.tamaño} bytes</p>
-                <p>Tipo URL: ${data.tipo_url}</p>
-                <p>Carpeta ID: ${data.carpeta_id}</p>
-            `;
+            modalContent.innerHTML = content;
+            modal.style.display = "block";
+        }
 
-            // Mostrar el modal con el contenido
-            abrirModal(modalContent);
-            
-            // Aquí puedes manipular los datos recibidos según tus necesidades
-        } catch (error) {
-            console.error('Error en la búsqueda:', error);
+        // Función para cerrar el modal
+        function cerrarModal() {
+            const modal = document.getElementById("myModal");
+            modal.style.display = "none";
+        }
 
-            // En caso de error, mostrar un mensaje de error en el modal
-            const errorMessage = `Error en la búsqueda: ${error.message}`;
-            abrirModal(errorMessage);
+    function eliminarArchivoPorId() {
+        // Obtener el valor del campo de entrada
+        const idArchivo = document.getElementById("inputEliminarArchivo").value;
+
+        // Verificar si se ingresó un ID válido
+        if (idArchivo.trim() !== "") {
+            // Confirmar antes de eliminar
+            const confirmacion = confirm(`¿Estás seguro de que quieres eliminar el archivo con ID ${idArchivo}?`);
+            if (confirmacion) {
+                // Llamar a la función eliminarArchivo con el ID proporcionado
+                eliminarArchivo(idArchivo);
+            }
+        } else {
+            alert("Por favor, ingrese un ID válido.");
         }
     }
 
-    // Función para abrir el modal
-    function abrirModal(content) {
-        const modal = document.getElementById("myModal");
-        const modalContent = document.getElementById("modalContent");
-        
-        modalContent.innerHTML = content;
-        modal.style.display = "block";
+    function eliminarArchivo(id) {
+        // Utilizar fetch para realizar la solicitud DELETE
+        fetch(`http://127.0.0.1:8000/file/delete_file/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                // Puedes incluir encabezados de autorización si es necesario
+            },
+            // Puedes incluir un cuerpo JSON si es necesario
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Manejar la respuesta después de eliminar el archivo
+            console.log(data);
+            // Puedes realizar acciones adicionales después de eliminar el archivo si es necesario
+        })
+        .catch(error => {
+            console.error('Error al eliminar el archivo:', error);
+        });
     }
-
-    // Función para cerrar el modal
-    function cerrarModal() {
-        const modal = document.getElementById("myModal");
-        modal.style.display = "none";
-    }
-
-
     </script>
+
 </head>
 <body>
     <header>
@@ -504,9 +510,9 @@
 <input type="text" id="pedidoId" name="pedidoId" placeholder="Ingrese el término de búsqueda para un archivo" style="margin-top: 40px; width: 800px; margin-left: 300px;">
 <button onclick="buscar()" class="btn">Buscar</button>
 
+
     <div class="container mt-4">
         <div class="row">
-
 
 
             <div class="col-md-3">
@@ -537,11 +543,15 @@
         <!-- Botón para cargar archivo -->
         <input type="file" id="fileInput" class="mr-2">
         <button onclick="subir_archivo()" class="btn btn-danger mr-2">Cargar Archivo</button>
+        
+
 
         <!-- Botón para crear nueva carpeta -->
         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#crearCarpetaModal">
             Crear Nueva Carpeta
         </button>
+        
+
     </div>
                     <div id="uploadedFiles"></div>
 
@@ -567,11 +577,20 @@
                             <input type="text" class="form-control" id="nombreCarpeta" value="" placeholder="Ingrese el nombre">
                         </div>
                         <button onclick="crear_carpeta()" class="btn btn-danger">Crear Carpeta</button>
+
                     </form>
+
                 </div>
             </div>
         </div>
     </div>
+
+    
+    <div class="mt-3">
+        <input type="text" id="inputEliminarArchivo" placeholder="ID del archivo" style="width: 117px; margin-left:1037px;">
+        <button onclick="eliminarArchivoPorId()" class="btn btn-danger btn-sm">Eliminar Archivo</button>
+    </div>
+
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>

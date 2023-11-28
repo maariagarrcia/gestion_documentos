@@ -99,8 +99,8 @@ async def upload_file(carpeta_id:int,file: UploadFile = File(...),db: Session = 
     return {"filename": file_path}
 
 @router.delete("/delete_file/{id}")
-async def delete_file(id: int, db: Session = Depends(get_db), current_user: UserAuth = Depends(get_current_user)):
-    file = db_file.CrudFile.delete_file(id, db, current_user.id)
+async def delete_file(id: int, db: Session = Depends(get_db)):
+    file = db_file.CrudFile.delete_file(id, db)
     return {"message": "ok"}
 
 @router.get("/get_file/{id}")
@@ -112,7 +112,6 @@ async def get_file(id: int, db: Session = Depends(get_db)):
 async def get_files(carpeta_id: int, db: Session = Depends(get_db)):
     files = db_file.CrudFile.get_files(carpeta_id, db)
     return files
-
 
 
 @router.get('/get_documento/{documento_id}')

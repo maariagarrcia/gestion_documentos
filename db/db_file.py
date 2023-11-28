@@ -86,14 +86,12 @@ class CrudFile(CrudFileInterface):
     
 
     @staticmethod
-    def delete_file(id:int, db: Session, user_id: int):
+    def delete_file(id:int, db: Session):
         file = db.query(DbFile).filter(DbFile.id == id).first()
         
         if not file:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="File not found")
         
-        if file.user_id != user_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You can't delete this file,only the owner can")
         
         db.delete(file)
         db.commit()
