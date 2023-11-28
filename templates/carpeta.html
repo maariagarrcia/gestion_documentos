@@ -159,48 +159,51 @@
             divBotones.appendChild(btnSiguiente);
         }
 
-        async function cargar_contenido_carpeta(carpeta) {
-            try {
-                // Realizar una llamada al servidor para obtener los archivos de la carpeta seleccionada
-                const response = await fetch(`http://127.0.0.1:8000/file/get_documento/${carpeta}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
+async function cargar_contenido_carpeta(carpeta) {
+    try {
+        // Realizar una llamada al servidor para obtener los archivos de la carpeta seleccionada
+        const response = await fetch(`http://127.0.0.1:8000/file/get_documento/${carpeta}`);
 
-                const documentos = await response.json();
-
-                // Registro del clic en la carpeta
-
-
-                // Actualizar la carpeta actual en la interfaz
-                document.getElementById("carpeta-actual").innerText = `Carpeta Actual: ${carpeta}`;
-                setCookie("carpeta", carpeta, 1);
-
-                // quiero q carpeta sea un string
-                const carpeta_str = carpeta.toString();
-
-
-                registrarClic(carpeta_str, 'carpeta');
-
-                // Actualizar la lista de archivos en la interfaz
-                const listaArchivos = document.getElementById("listaArchivos");
-                listaArchivos.innerHTML = "";
-
-                documentos.forEach(documento => {
-                    const documentoElemento = document.createElement("li");
-                    documentoElemento.classList.add("list-group-item");
-                    documentoElemento.textContent = documento;
-                    listaArchivos.appendChild(documentoElemento).addEventListener("click", function () {
-                        displayFile(documento);
-                    });
-
-                });
-            } catch (error) {
-                console.error('Error:', error);
-            }
-            
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
+        const documentos = await response.json();
+
+        // Registro del clic en la carpeta
+
+        // Actualizar la carpeta actual en la interfaz
+        document.getElementById("carpeta-actual").innerText = `Carpeta Actual: ${carpeta}`;
+        setCookie("carpeta", carpeta, 1);
+
+        // quiero que carpeta sea un string
+        const carpeta_str = carpeta.toString();
+
+        // Realizar el registro del clic
+        const clicResponse = await registrarClic(carpeta_str, 'carpeta');
+        
+        console.log('Clic Response:', clicResponse); // Agregado para depuración
+
+
+        // Si registrarClic devuelve un código de estado 200, continuar con el resto del código
+        // Actualizar la lista de archivos en la interfaz
+        const listaArchivos = document.getElementById("listaArchivos");
+        listaArchivos.innerHTML = "";
+        documentos.forEach(documento => {
+            const documentoElemento = document.createElement("li");
+            documentoElemento.classList.add("list-group-item");
+            documentoElemento.textContent = documento;
+            listaArchivos.appendChild(documentoElemento).addEventListener("click", function () {
+                displayFile(documento);
+            });
+        });
+        
+
+        
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
         function displayFile(documento) {
             // Eliminar espacios en blanco al principio o al final del nombre del archivo
             const nombreArchivo = documento.trim().replace("Archivo:", "");
@@ -227,11 +230,12 @@
             const baseUrl = `http://127.0.0.1:8000/files/${tipoArchivo}/`;
             const fileUrl = `${baseUrl}${nombreArchivoUrl}`;
 
+            // Realizar el registro del clic
+
+
             // Abrir la URL en una nueva pestaña
             window.open(fileUrl, '_blank');
             
-            registrarClic(nombreArchivoUrl, 'archivo');
-
         }
 
 
@@ -354,32 +358,34 @@
         }
 
 async function registrarClic(elemento, tipo) {
-    const user_id = getCookie("user_id");
-
-    const json = {
-        user_id: user_id,
-        elemento: elemento,
-        tipo: tipo,
-    };
-
     try {
-        const response = await fetch("http://127.0.0.1:8000/registrar_clic", {
-            method: "POST",
+        // Realizar una llamada al servidor para registrar el clic
+        const response = await fetch('http://127.0.0.1:8000/registrar_clic', {
+            method: 'POST',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify(json),
+            body: JSON.stringify({
+                user_id: getCookie("user_id"), // Cambia esto con el ID de usuario correcto
+                elemento: elemento,
+                tipo: tipo,
+            }),
         });
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
-        const result = await response.json();
-        console.log(result);
-
+        const data = await response.json();
+        console.log('Clic registrado con éxito:', data.message);
     } catch (error) {
-        console.error('Error:', error);
+        if (error instanceof PermissionDeniedException) {
+            // Manejar la excepción específica de permisos denegados
+            alert("No tienes permisos para registrar clics. Acceso bloqueado.");
+            // Aquí puedes realizar otras acciones, como bloquear otras operaciones
+        } else {
+            console.error('Error al registrar clic:', error);
+        }
     }
 }
 

@@ -17,8 +17,10 @@ from auth import authentication
 
 from fastapi.responses import JSONResponse
 
-from schemas import RegistroClic
+from schemas import RegistroClic, UserAuth
 from proxy import *
+
+from auth.oauth2 import get_current_user
 
 
 
@@ -43,22 +45,13 @@ async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
-def guardar_en_archivo(info):
-    with open("registros_clic.txt", "a") as archivo:
-        archivo.write(info + "\n")
 
 @app.post("/registrar_clic")
 async def registrar_clic(registro: RegistroClic):
-    try:
-        # Formatear la información
-        info = f"User ID: {registro.user_id}, Elemento: {registro.elemento}, Tipo: {registro.tipo}"
-
-        # Guardar la información usando el proxy
-        proxy_guardador.guardar(info)
-
-        return {"message": "Clic registrado con éxito"}
-    except Exception as e:
-        return {"error": str(e)}
+   
+    info = f"User ID: {registro.user_id}, Elemento: {registro.elemento}, Tipo: {registro.tipo}"
+    proxy_guardador.guardar(info, registro.user_id )
+    return JSONResponse(status_code=200, content={"message": "Clic registrado con éxitoa"})
 
 models.Base.metadata.create_all(engine)
 
