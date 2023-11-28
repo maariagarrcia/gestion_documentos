@@ -19,7 +19,7 @@ GESTOR DE DOCUMENTOS
    - Registra cada acceso o modificación a documentos sensibles.
    - Solo permite el acceso a usuarios autorizados.
  
- **2. EXPLICACIÓN:**
+ **1. EXPLICACIÓN:**
 El sistema de gestión documental va más allá de ser una simple plataforma de almacenamiento. Permite a los usuarios realizar una variedad de acciones, desde la creación y modificación de documentos hasta la organización y gestión de carpetas y archivos. La estructura jerárquica facilita la ubicación rápida de la información, promoviendo la eficiencia en la gestión del conocimiento.
 
 - Creación y Modificación de Documentos:
@@ -32,7 +32,7 @@ El sistema de gestión documental va más allá de ser una simple plataforma de 
  La estructura jerárquica de carpetas permite una recuperación rápida y eficiente de la información, reduciendo el tiempo necesario para encontrar documentos específicos.
 
  
- **3. PATRONES DE DISEÑO:**
+ **2. PATRONES DE DISEÑO:**
  - COMPOSITE: El composite es un patrón estructural que permite utlizar colectivamente un conjunto de objetos como una entidad única, independiendtemente de si son objetos           individuales o estructuras compuestas de múltiples objetos.
   Por ello, podremos observar como está estructurado en carpetas y archivos nuestro gestor, el usuario podrá crear, eliminar, modificar, buscar y ver sus documentos.
   Recalcar que una carpeta es un conjunto de archivos o de carpetas también. Todos los datos recogidos de la base de datos se convierten en objetos para el frontend y un buen uso    de este patrón.
