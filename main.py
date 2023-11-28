@@ -48,10 +48,10 @@ async def root(request: Request):
 
 @app.post("/registrar_clic")
 async def registrar_clic(registro: RegistroClic):
-   
     info = f"User ID: {registro.user_id}, Elemento: {registro.elemento}, Tipo: {registro.tipo}"
-    proxy_guardador.guardar(info, registro.user_id )
-    return JSONResponse(status_code=200, content={"message": "Clic registrado con éxitoa"})
+    
+    proxy_guardador.guardar(info, registro.user_id)
+    return JSONResponse(status_code=200, content={"message": "Clic registrado con éxito"})
 
 models.Base.metadata.create_all(engine)
 

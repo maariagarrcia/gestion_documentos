@@ -1,0 +1,4 @@
+Intento fallido - User ID: 2, Info: User ID: 2, Elemento: 3, Tipo: carpeta
+Intento fallido - User ID: 2, Info: User ID: 2, Elemento: 3, Tipo: carpeta
+Intento fallido - User ID: 2, Info: User ID: 2, Elemento: 2, Tipo: carpeta
+Intento fallido - User ID: 2, Info: User ID: 2, Elemento: 2, Tipo: carpeta

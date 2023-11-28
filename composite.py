@@ -10,14 +10,26 @@ class Componente:
         """
         pass
 
+    def obtener_tamaño(self) -> int:
+        """
+        Método para obtener el tamaño del componente
+        """
+        pass
+
 class Archivo(Componente):
     nombre: str
 
     def __init__(self, nombre: str):
         self.nombre = nombre
+        self.tamaño =tamaño
 
     def obtener_detalles(self) -> List[str]:
         return [f"Archivo: {self.nombre}"]
+    
+    def obtener_tamaño(self) -> int:
+        return [f"Archivo: {self.tamaño}"]
+    
+        
 
 class Carpeta(Componente):
     nombre: str

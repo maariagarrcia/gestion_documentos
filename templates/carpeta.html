@@ -235,6 +235,9 @@ async function cargar_contenido_carpeta(carpeta) {
 
             // Abrir la URL en una nueva pestaña
             window.open(fileUrl, '_blank');
+
+            // Registro del clic en el archivo
+            registrarClic(nombreArchivo, 'archivo');
             
         }
 
